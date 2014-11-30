@@ -917,10 +917,17 @@ you find any mistakes or typos.
 
 ## <a name='testing'>Testing</a>
 
-  - Use [busted](olivinelabs.com/busted) and write lots of tests in a /spec 
+ - Use **property based testing** whenever possible or making sense.
+
+ - Use unit testing when the complexity of the generators for property
+   based testing equals the complexity of the algorithm being tested.
+
+ - There are
+   [plenty of unit testing frameworks](http://lua-users.org/wiki/UnitTesting). Choose
+   one like [lunatest](https://github.com/silentbicycle/lunatest) that
+   has also some propety based testing capacity.
+  - Write tests in a `test` directory
     folder. Separate tests by module.
-  - Use descriptive `describe` and `it` blocks so it's obvious to see what
-    precisely is failing.
   - Test interfaces. Don't test private methods. If you need to test something
     that is private, it probably shouldn't be private in the first place.
   - Example:
@@ -930,11 +937,11 @@ you find any mistakes or typos.
       bin/
         script.sh
 
-      spec/
-        my_module_spec.lua
+      test/
+        my_module_test.lua
 
         util/
-          formatters_spec.lua
+          formatters_test.lua
 
       src/
         my_module.lua
