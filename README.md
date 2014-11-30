@@ -22,6 +22,7 @@ you find any mistakes or typos.
   1. [Whitespace](#whitespace)
   1. [Commas](#commas)
   1. [Semicolons](#semicolons)
+  1. [Require](#require)
   1. [Type Casting & Coercion](#type-coercion)
   1. [Naming Conventions](#naming-conventions)
   1. [Accessors](#accessors)
@@ -251,7 +252,36 @@ you find any mistakes or typos.
       return true
     end
     ```
+  - Always use
+    [Luadoc](http://kiki.to/blog/2014/03/30/a-guide-to-authoring-lua-modules/)
+    for documenting a function or a table.
 
+    ```lua
+    -- Not structured documentation of functions is bad.
+    local is_good_name = function(name, options, arg)
+      local foobar
+
+      -- ...stuff...
+
+      return foobar + 2
+    end
+
+    --- This is a properly documented function.
+    --
+    -- @param name string that is being operated upon.
+    -- @param options table that specifies the string options.
+    --
+    -- @return boolean
+    --   true if the string has any of the options given.
+    --
+    local is_good_name = function(name, options)
+      if #name < 3 or #name > 30 then return false end
+
+      -- ...stuff...
+
+      return true
+    end
+    ```
   **[[⬆]](#TOC)**
 
 
@@ -435,7 +465,6 @@ you find any mistakes or typos.
 
 
     **[[⬆]](#TOC)**
-
 
 ## <a name='blocks'>Blocks</a>
 
@@ -629,6 +658,21 @@ you find any mistakes or typos.
 
     **[[⬆]](#TOC)**
 
+## <a name='require'>Require</a>
+
+ - The `require` statement should be invoked **without**
+   parentheses. Doing so makes clear that require has a single
+   argument and distinguishes itself from other function
+   invocations.
+
+    ```lua
+    -- bad
+    local foobar = require('something')
+
+    -- good
+    local foobar = require 'something'
+    ```
+    **[[⬆]](#TOC)**
 
 ## <a name='type-coercion'>Type Casting & Coercion</a>
 
@@ -710,10 +754,10 @@ you find any mistakes or typos.
 
     ```lua
     -- bad
-    local player = require('player')
+    local player = require 'player'
 
     -- good
-    local Player = require('player')
+    local Player = require 'player'
     local me = Player({ name = 'Jack' })
     ```
 
@@ -759,6 +803,90 @@ you find any mistakes or typos.
     unless static (like utility libraries.)
 
   **[[⬆]](#TOC)**
+
+  - Needed functions from other modules should be copied to local
+    variables at the beginning.
+
+  - The same goes for required modules.
+
+
+    ```lua
+    -- My first module.
+
+    local foo = require 'foo'
+    local format = string.format
+
+    -- thing.lua
+    local M = { }
+
+
+    --- Multiplies a number by itself and adds it to another.
+    -- @param a integer to be added and multiplied.
+    -- @param b integer to be added only.
+    --
+    -- @return integer 
+    --   the result of multiplying a by itself and adding b.
+    function M.quux(a, b)
+      return a * a + b
+      end
+
+    -- Export the module table.
+    return M
+    ```
+  - After that make sur that **global** identifiers are no longer
+    reachable by using the idiom:
+  
+    ```lua
+    -- Avoid polluting the global environment.
+    -- If we are in Lua 5.1 this function exists.
+    if _G.setfenv then
+       setfenv(1, {})
+    else -- Lua 5.2.
+      _ENV = nil
+    end
+
+    ```
+  - So the above code will be in its entirety.
+    
+    ```lua
+    -- My first module.
+
+    local foo = require 'foo'
+    local format = string.format
+
+    -- Avoid polluting the global environment.
+    -- If we are in Lua 5.1 this function exists.
+    if _G.setfenv then
+       setfenv(1, {})
+    else -- Lua 5.2.
+      _ENV = nil
+    end
+
+    -- thing.lua
+    local M = { }
+
+    --- Multiplies a number by itself and adds it to another.
+    -- @param a integer to be added and multiplied.
+    -- @param b integer to be added only.
+    --
+    -- @return integer 
+    --   the result of multiplying a by itself and adding b.
+    function M.quux(a, b)
+      return a * a + b
+      end
+
+    -- Export the module table.
+    return M
+    ```
+ - It's preferable to name the functions prefixed by the table module
+   name, like the above instead of making all functions local and
+   declaring the table at the end of the module and assigning the
+   indexes to the local functions. When the table name prefixes the
+   function it's clear that the function it's **exported** and it's
+   part of the module API. 
+   
+ - For a in depth look on the multiple appraches to declare Lua
+   modules see [this guide](http://kiki.to/blog/2014/03/30/a-guide-to-authoring-lua-modules/).
 
 ## <a name='file-structrure'>File Structure</a>
 
