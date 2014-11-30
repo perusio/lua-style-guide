@@ -926,11 +926,11 @@ you find any mistakes or typos.
    [plenty of unit testing frameworks](http://lua-users.org/wiki/UnitTesting). Choose
    one like [lunatest](https://github.com/silentbicycle/lunatest) that
    has also some propety based testing capacity.
-  - Write tests in a `test` directory
+ - Write tests in a `test` directory
     folder. Separate tests by module.
-  - Test interfaces. Don't test private methods. If you need to test something
+ - Test interfaces. Don't test private methods. If you need to test something
     that is private, it probably shouldn't be private in the first place.
-  - Example:
+ - Example:
 
     ```
     ./my_module
